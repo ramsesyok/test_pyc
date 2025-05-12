@@ -11,6 +11,9 @@ int main()
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append('.')");
 
+    // Pythonパスにサブディレクトリを追加
+    PyRun_SimpleString("sys.path.append('./msg')");
+
     // script_mainモジュールをインポート
     PyObject *pModule = PyImport_ImportModule("script_main");
     if (!pModule)
@@ -55,7 +58,7 @@ int main()
     }
 
     // IntroductionRequestのインスタンスを作成
-    PyObject *pReqArgs = Py_BuildValue("(s,i,[s,s])", "John", 30, "coding", "reading");
+    PyObject *pReqArgs = Py_BuildValue("(s,i,[s,s])", "John", 40, "coding", "reading");
     PyObject *pReq = PyObject_CallObject(pClass, pReqArgs);
     Py_DECREF(pReqArgs);
     Py_DECREF(pClassModule);

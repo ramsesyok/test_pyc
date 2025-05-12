@@ -5,7 +5,7 @@ from introduction_request import IntroductionRequest
 def greeting(req: IntroductionRequest) -> GreetingResponse:
     print("Hello, this is my script!")
     message = f"Hello {req.name}, you are {req.age} years old and your interests are {', '.join(req.interests)}."
-    return GreetingResponse(message)
+    return GreetingResponse(message,req.age)
 
 if __name__ == "__main__":
     # This block ensures the script can be imported as a module

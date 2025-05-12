@@ -4,40 +4,40 @@
 
 int main()
 {
-    // Initialize the Python interpreter
+    // Pythonインタープリタを初期化
     Py_Initialize();
 
-    // Add the current directory to the Python path
+    // Pythonパスに現在のディレクトリを追加
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append('.')");
 
-    // Import the script_main module
+    // script_mainモジュールをインポート
     PyObject *pModule = PyImport_ImportModule("script_main");
     if (!pModule)
     {
         PyErr_Print();
-        std::cerr << "Failed to load script_main module" << std::endl;
+        std::cerr << "script_mainモジュールの読み込みに失敗しました" << std::endl;
         Py_Finalize();
         return 1;
     }
 
-    // Get the greeting function from the module
+    // script_mainモジュールからgreeting関数を取得
     PyObject *pFunc = PyObject_GetAttrString(pModule, "greeting");
     if (!pFunc || !PyCallable_Check(pFunc))
     {
         PyErr_Print();
-        std::cerr << "Failed to load greeting function" << std::endl;
+        std::cerr << "greeting関数の取得に失敗しました" << std::endl;
         Py_DECREF(pModule);
         Py_Finalize();
         return 1;
     }
 
-    // Import the IntroductionRequest class
+    // IntroductionRequestクラスをインポート
     PyObject *pClassModule = PyImport_ImportModule("introduction_request");
     if (!pClassModule)
     {
         PyErr_Print();
-        std::cerr << "Failed to load introduction_request module" << std::endl;
+        std::cerr << "introduction_requestモジュールの読み込みに失敗しました" << std::endl;
         Py_DECREF(pModule);
         Py_Finalize();
         return 1;
@@ -47,14 +47,14 @@ int main()
     if (!pClass || !PyCallable_Check(pClass))
     {
         PyErr_Print();
-        std::cerr << "Failed to load IntroductionRequest class" << std::endl;
+        std::cerr << "IntroductionRequestクラスの取得に失敗しました" << std::endl;
         Py_DECREF(pClassModule);
         Py_DECREF(pModule);
         Py_Finalize();
         return 1;
     }
 
-    // Create an instance of IntroductionRequest
+    // IntroductionRequestのインスタンスを作成
     PyObject *pReqArgs = Py_BuildValue("(s,i,[s,s])", "John", 30, "coding", "reading");
     PyObject *pReq = PyObject_CallObject(pClass, pReqArgs);
     Py_DECREF(pReqArgs);
@@ -63,22 +63,22 @@ int main()
     if (!pReq)
     {
         PyErr_Print();
-        std::cerr << "Failed to create IntroductionRequest instance" << std::endl;
+        std::cerr << "IntroductionRequestインスタンスの作成に失敗しました" << std::endl;
         Py_DECREF(pClass);
         Py_DECREF(pModule);
         Py_Finalize();
         return 1;
     }
 
-    // Create arguments for the greeting function
+    // greeting関数の引数を作成
     PyObject *pArgs = PyTuple_New(1);
-    PyTuple_SetItem(pArgs, 0, pReq); // pReq reference is stolen here
+    PyTuple_SetItem(pArgs, 0, pReq); // pReqの参照はここで移譲される
 
-    // Call the greeting function
+    // greeting関数を呼び出し
     PyObject *pValue = PyObject_CallObject(pFunc, pArgs);
     if (pValue != nullptr)
     {
-        // Call the respond method on the GreetingResponse object
+        // GreetingResponseオブジェクトのrespondメソッドを呼び出し
         PyObject *pRespond = PyObject_GetAttrString(pValue, "respond");
         if (pRespond && PyCallable_Check(pRespond))
         {
@@ -98,6 +98,19 @@ int main()
         {
             PyErr_Print();
         }
+
+        // GreetingResponseオブジェクトからage属性を取得
+        PyObject *pAge = PyObject_GetAttrString(pValue, "age");
+        if (pAge && PyLong_Check(pAge))
+        {
+            std::cout << "Age: " << PyLong_AsLong(pAge) << std::endl;
+            Py_DECREF(pAge);
+        }
+        else
+        {
+            PyErr_Print();
+        }
+
         Py_DECREF(pValue);
     }
     else
@@ -105,13 +118,13 @@ int main()
         PyErr_Print();
     }
 
-    // Clean up
+    // 後処理
     Py_DECREF(pArgs);
     Py_DECREF(pClass);
     Py_DECREF(pFunc);
     Py_DECREF(pModule);
 
-    // Finalize the Python interpreter
+    // Pythonインタープリタを終了
     Py_Finalize();
 
     return 0;

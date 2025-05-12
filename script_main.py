@@ -1,6 +1,6 @@
 import sys
-from greeting_response import GreetingResponse
-from introduction_request import IntroductionRequest
+from msg.greeting_response import GreetingResponse
+from msg.introduction_request import IntroductionRequest
 
 def greeting(req: IntroductionRequest) -> GreetingResponse:
     print("Hello, this is my script!")
